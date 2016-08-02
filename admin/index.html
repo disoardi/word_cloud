@@ -1,0 +1,76 @@
+<!DOCTYPE html>
+<html>
+<script src="http://d3js.org/d3.v3.min.js"></script>
+<script src="/public/d3.layout.cloud.js"></script>
+<head>
+    <title>Word Cloud Example</title>
+    <style>
+        body {
+            font-family:"Lucida Grande","Droid Sans",Arial,Helvetica,sans-serif;
+        }
+        .legend {
+            border: 1px solid #555555;
+            border-radius: 5px 5px 5px 5px;
+            font-size: 0.8em;
+            margin: 10px;
+            padding: 8px;
+        }
+        .bld {
+            font-weight: bold;
+        }
+    </style>
+    <script src="/socket.io/socket.io.js"></script>
+    <script>
+        var socket = io();
+        var frequency_list = [];
+        socket.on('server', function (data) {
+//          console.log(data);
+            var idx = frequency_list.findIndex (function (it) { return it.text == data  });
+            console.log(idx);
+            if ( idx == -1) {
+                frequency_list.push({ "text":data,"size":30 });
+            } else {
+                frequency_list[idx].size += 15;
+            }
+            console.log(frequency_list);
+//          var frequency_list = [{"text":"studio","size":30}];
+//          console.log(frequency_list);
+            var color = d3.scale.linear()
+                    .domain([0,1,2,3,4,5,6,10,15,20,100])
+//                  .range(["#ddd", "#ccc", "#bbb", "#aaa", "#999", "#888", "#777", "#666", "#555", "#444", "#333", "#222"]);
+                    .range(["#7FFFD4", "#FBCEB1", "#E52B50", "#FFBF00", "#884DA7", "#FC6C85", "#293133", "#ED7465", "#FFA500", "#708090", "#C0C0C0", "#87A96B", "#5D8AA8", "#FFFFF0", "#D3305D", "#007FFF", "#ABCDEF", "#F5F5DC", "#908435", "#BEBD7F", "#FFFFFF", "#FFFEEF", "#F2F3F4", "#FAEBD7", "#FEFEE9", "#F8F8FF", "#FFFAF0", "#F5F5F5", "#FFDEAD", "#FFE4C4", "#3D2B1F", "#0000FF", "#4682B4", "#F0F8FF", "#0095B6", "#5F9EA0", "#2A52BE", "#007BB8", "#1C39BB", "#003153", "#1E90FF", "#003399", "#002FA7", "#000080", "#343A90", "#120A8F", "#4169E1", "#800000", "#800020", "#CD7F32", "#75663F", "#F0DC82", "#050402", "#D8BFD8", "#960018", "#E0FFFF", "#CD5C5C", "#986960", "#DDADAF", "#D2B48C", "#918151", "#ACE1AF", "#99CBFF", "#007BA7", "#08457E", "#7FFF00", "#00FFFF", "#DE3163", "#D2691E", "#0047AB", "#FFF5EE", "#FF7F50", "#FFFDD0", "#DC143C", "#1560BD", "#5E86C1", "#DF73FF", "#C2B280", "#6495ED", "#008080", "#F400A1", "#E0AFEE", "#EBB55F", "#DCDCDC", "#00A86B", "#FFFF00", "#A98307", "#F7E89F", "#FFFF66", "#C6A664", "#E5BE01", "#FFD800", "#C9A0DC", "#7B1B02", "#F5DEB3", "#808080", "#F7F7F7", "#EFEFEF", "#D2D2D2", "#B2B2B2", "#8F8F8F", "#808080", "#5F5F5F", "#4F4F4F", "#404040", "#2F2F2F", "#465945", "#2F4F4F", "#778899", "#E4E5E0", "#D0AFAE", "#CADABA", "#646B63", "#CC8899", "#4B0082", "#6F00FF", "#310062", "#002FA7", "#F4F0EC", "#C3B091", "#F0E68C", "#BDB76B", "#E30B5C", "#E6E6FA", "#DABAD0", "#FFF0F5", "#FDE910", "#FFFACD", "#C8A2C8", "#CCFF00", "#FAF0E6", "#FF00FF", "#F984E5", "#F8F4FF", "#993366", "#996666", "#FFCC00", "#964B00", "#CD853F", "#987654", "#993300", "#DABDAB", "#654321", "#990066", "#C04000", "#000000", "#CC7722", "#9AB973", "#DA70D6", "#FFD700", "#CFB53B", "#CC9966", "#FFEFD5", "#D1E231", "#CCCCFF", "#FFE5B4", "#FFDAB9", "#FFCC99", "#FADFAD", "#93C572", "#E5E4E2", "#B20000", "#660066", "#B87333", "#FFC0CB", "#FF9966", "#DB244F", "#997A8D", "#FADADD", "#FFD1DC", "#E75480", "#FC0FC0", "#FF007F", "#FF0000", "#CC5500", "#C41E3A", "#CC0000", "#801818", "#CE3018", "#A61022", "#B22222", "#BD8E80", "#FF6347", "#D21F1B", "#FF6088", "#500000", "#A52019", "#BA6262", "#C80815", "#C71585", "#DB7093", "#410012", "#F4A460", "#FF8C69", "#E9967A", "#92000A", "#FF2400", "#560319", "#704214", "#DAA520", "#B8860B", "#D2B48C", "#CD5700", "#635147", "#8A3324", "#E97451", "#531B00", "#754909", "#D0F0C0", "#BADBAD", "#79443B", "#30D5C8", "#08E8DE", "#99FFCC", "#116062", "#32C6A6", "#00CCCC", "#96DED1", "#00FF00", "#00CC99", "#228b22", "#66FF00", "#ADFF2F", "#2E8B57", "#3CB371", "#8FBC8F", "#98FF98", "#A6FBB2", "#ADDFAD", "#808000", "#6B8E23", "#556B2F", "#77DD77", "#01796F", "#00FF7F", "#177245", "#008000", "#50C878", "#40826D", "#FF4D00", "#8F00FF", "#9F00FF", "#991199", "#C0007F", "#F4C430", "#FF9933", "#0F52BA"]);
+
+            d3.layout.cloud().size([800, 300])
+                .words(frequency_list)
+                .rotate(0)
+                .fontSize(function(d) { return d.size; })
+                .on("end", draw)
+                .start();
+
+            function draw(words) {
+                d3.select("svg").remove();
+                d3.select("body").append("svg")
+                    .attr("width", 850)
+                    .attr("height", 350)
+                    .attr("class", "wordcloud")
+                    .append("g")
+                    // without the transform, words words would get cutoff to the left and top, they would
+                    // appear outside of the SVG area
+                    .attr("transform", "translate(320,200)")
+                    .selectAll("text")
+                    .data(words)
+                    .enter().append("text")
+                    .style("font-size", function(d) { return d.size + "px"; })
+                    .style("fill", function(d, i) { return color(i); })
+                    .attr("transform", function(d) {
+                        return "translate(" + [d.x, d.y] + ")rotate(" + d.rotate + ")";
+                    })
+                    .text(function(d) { return d.text; });
+            }
+        });
+    </script>
+</head>
+    <body>
+
+    </body>
+</html>

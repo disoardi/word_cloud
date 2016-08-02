@@ -1,0 +1,20 @@
+{
+    "name": "Word Cloud",
+    "version": "0.1.1",
+    "description": "Worl Cloud Tag",
+    "dependencies": {
+        "express": "latest",
+        "http": "latest",
+        "socket.io": "latest"
+    },
+    "main": "index.html",
+    "scripts": {
+        "test": "echo \"Error: no test specified\" && exit 1"
+    },
+    "repository": {
+        "type": "git",
+        "url": "https://github.com/disoardi/word_cloud"
+    },
+    "author": "abacus",
+    "license": "Apache-2.0"
+}
